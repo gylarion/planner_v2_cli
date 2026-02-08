@@ -13,7 +13,7 @@ def is_owner_or_admin(planner: Planner, user_id: str) -> bool:
 
 def can_manage_members(planner: Planner, user_id: str) -> bool:
     member = get_member(planner, user_id)
-    return bool(member and (member.role == Role.Owner or Permission.MANAGE_MEMBERS in member.permissions))
+    return bool(member and (member.role == Role.OWNER or Permission.MANAGE_MEMBERS in member.permissions))
 
 def can_view_logs(planner: Planner, user_id: str) -> bool:
     member = get_member(planner, user_id)

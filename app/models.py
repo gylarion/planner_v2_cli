@@ -18,7 +18,7 @@ class GuestSession:
     user_name: str
     created_at: datetime
 
-@dataclass(frozen=True)
+@dataclass
 class Member:
     user_id: str
     role: Role
@@ -42,7 +42,6 @@ class Task:
     planner_id: str
     author_id: str
     text: str
-    date: datetime
     deadline: Optional[str]
     created_at: datetime
     updated_at: datetime
