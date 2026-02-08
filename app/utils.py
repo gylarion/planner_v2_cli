@@ -1,5 +1,5 @@
 import uuid
-from datetime import datetime
+from datetime import datetime, timezone
 
 
 def new_id(prefix: str) -> str:
@@ -7,4 +7,4 @@ def new_id(prefix: str) -> str:
 
 
 def now() -> datetime:
-    return datetime.now(datetime.UTC)
+    return datetime.now(timezone.utc)
