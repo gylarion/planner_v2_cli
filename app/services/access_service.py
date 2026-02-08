@@ -219,3 +219,54 @@ def reject_request(state, request_id: str, actor_id: str) -> None:
         "REQUEST_REJECTED",
         f"id={request_id}",
     )
+
+def update_member_role(
+    state,
+    planner_id: str,
+    actor_id: str,
+    target_user_id: str,
+    new_role: Role,
+) -> None:
+    planner = next((p for p in state["planners"] if p.planner_id == planner_id), None)
+    if not planner:
+        raise ServiceError("Planner not found")
+
+    if not is_owner_or_admin(planner, actor_id):
+        raise ServiceError("No permission to update member roles")
+
+    if actor_id == target_user_id:
+        raise ServiceError("Cannot change own role")
+
+    target = get_member(planner, target_user_id)
+    if not target:
+        raise ServiceError("Target user is not a member")
+
+    if target.role == Role.OWNER:
+        raise ServiceError("Cannot change OWNER role")
+
+    if new_role == Role.OWNER:
+        raise ServiceError("Cannot assign OWNER role")
+
+    if new_role == Role.ADMIN:
+        permissions = {
+            Permission.EDIT_ALL_TASKS,
+            Permission.MANAGE_MEMBERS,
+            Permission.VIEW_LOGS,
+        }
+    elif new_role == Role.MEMBER:
+        permissions = {Permission.EDIT_OWN_TASKS}
+    else:
+        permissions = set()
+
+    target.role = new_role
+    target.permissions = permissions
+
+    planner.updated_at = now()
+    log_action(
+        state,
+        planner_id,
+        actor_id,
+        "MEMBER_ROLE_UPDATED",
+        f"user={target_user_id}, role={new_role.value}",
+    )
+
