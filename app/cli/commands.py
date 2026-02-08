@@ -211,7 +211,8 @@ def handle_command(state, ctx, raw: str) -> None:
     if cmd == "logs":
         logs = list_logs(state, ctx.current_planner_id, ctx.current_user_id)
         for l in logs:
-            print(f"[{l.created_at}] {l.action} {l.details}")
+            ts = l.created_at.strftime("%Y-%m-%d %H:%M:%S")
+            print(f"[{ts}] {l.action} {l.details}")
         return
 
 

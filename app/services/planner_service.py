@@ -16,7 +16,12 @@ def create_planner(
     is_guest: bool,
     guest_id: Optional[str],
 ) -> Planner:
-    ensure_user(state, owner_id)
+
+    if is_guest:
+        if not any(g.guest_id == guest_id for g in state["guests"]):
+            raise ServiceError("Guest not found")
+    else:
+        ensure_user(state, owner_id)
 
     created = now()
     expires = created + timedelta(days=5) if is_guest else None

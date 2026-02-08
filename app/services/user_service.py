@@ -10,7 +10,15 @@ def ensure_user(state, user_id: str) -> None:
         raise ServiceError("User not found")
 
 def create_user(state, name: str, email: Optional[str]) -> User:
-    user = User(user_id=new_id("user"), name=name, email=email)
+    if email:
+        if any(u.email == email for u in state["users"]):
+            raise ServiceError("User with this email already exists")
+
+    user = User(
+        user_id=new_id("user"),
+        name=name,
+        email=email,
+    )
     state["users"].append(user)
     return user
 

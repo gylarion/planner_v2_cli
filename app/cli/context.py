@@ -19,7 +19,7 @@ class CLIContext:
             if user:
                 parts.append(f"UserName : {user.name} | user_id -({user.user_id})")
             elif guest:
-                parts.append(f"GuestName={guest.user_name}| guest_id - ({guest.guest_id})")
+                parts.append(f"GuestName={guest.user_name} | guest_id - ({guest.guest_id})")
 
         if self.current_planner_id:
             planner = next(
@@ -30,6 +30,6 @@ class CLIContext:
                 parts.append(f"name_planner: {planner.title}| planner_id - ({planner.planner_id})")
 
         if parts:
-            return "[" + " | ".join(parts) + "] > "
+            return "\n[" + " ]\n[".join(parts) + "] \n----------------------------------------------------------\n> "
 
         return "> "
