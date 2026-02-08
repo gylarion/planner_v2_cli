@@ -1,5 +1,8 @@
+from app.cli.loop import run_cli
+
+
 def main() -> None:
-    print("Planner CLI initialized. Next: domain models.")
+    run_cli()
 
 
 if __name__ == "__main__":
