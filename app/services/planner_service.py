@@ -96,3 +96,41 @@ def claim_guest_planner(
         "GUEST_PLANNER_CLAIMED",
         f"guest_id={guest_id}",
     )
+
+def cleanup_guest_planners(state) -> int:
+    current_time = now()
+
+    expired_planners = [
+        p for p in state["planners"]
+        if p.is_guest and p.expires_at and p.expires_at < current_time
+    ]
+
+    removed_count = 0
+
+    for planner in expired_planners:
+        planner_id = planner.planner_id
+
+        state["tasks"] = [
+            t for t in state["tasks"]
+            if t.planner_id != planner_id
+        ]
+
+        state["invites"] = [
+            i for i in state["invites"]
+            if i.planner_id != planner_id
+        ]
+
+        state["requests"] = [
+            r for r in state["requests"]
+            if r.planner_id != planner_id
+        ]
+
+        state["logs"] = [
+            l for l in state["logs"]
+            if l.planner_id != planner_id
+        ]
+
+        state["planners"].remove(planner)
+        removed_count += 1
+
+    return removed_count
