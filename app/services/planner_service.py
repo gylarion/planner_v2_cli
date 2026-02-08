@@ -47,3 +47,52 @@ def create_planner(
     state["planners"].append(planner)
     log_action(state, planner.planner_id, owner_id, "PLANNER_CREATED", title)
     return planner
+
+def claim_guest_planner(
+    state,
+    planner_id: str,
+    guest_id: str,
+    user_id: str,
+) -> None:
+    planner = next((p for p in state["planners"] if p.planner_id == planner_id), None)
+    if not planner:
+        raise ServiceError("Planner not found")
+
+    if not planner.is_guest:
+        raise ServiceError("Planner is not a guest planner")
+
+    if planner.expires_at and now() > planner.expires_at:
+        raise ServiceError("Guest planner expired")
+
+    if planner.guest_id != guest_id:
+        raise ServiceError("Guest does not own this planner")
+
+    planner.members = [
+        m for m in planner.members
+        if m.user_id != guest_id
+    ]
+
+    owner = Member(
+        user_id=user_id,
+        role=Role.OWNER,
+        permissions={
+            Permission.EDIT_ALL_TASKS,
+            Permission.MANAGE_MEMBERS,
+            Permission.MANAGE_SETTINGS,
+            Permission.VIEW_LOGS,
+        },
+    )
+    planner.members.append(owner)
+
+    planner.is_guest = False
+    planner.expires_at = None
+    planner.guest_id = None
+    planner.updated_at = now()
+
+    log_action(
+        state,
+        planner.planner_id,
+        user_id,
+        "GUEST_PLANNER_CLAIMED",
+        f"guest_id={guest_id}",
+    )
