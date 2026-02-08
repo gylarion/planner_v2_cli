@@ -72,7 +72,7 @@ class DataStore:
         guests = [
             GuestSession(
                 guest_id=g["guest_id"],
-                user_name=g["username"],
+                user_name=g["user_name"],
                 created_at=_dt(g["created_at"]),
             )
             for g in raw["guests"]
